@@ -1,1 +1,1 @@
-web: gunicorn trimurti.wsgi --worker-class=gevent
+web: gunicorn trimurti.wsgi --log-file -
