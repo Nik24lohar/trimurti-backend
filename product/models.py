@@ -15,3 +15,11 @@ class Card (models.Model):
     productId=models.ForeignKey(Product,CASCADE)
     userId=models.ForeignKey(CustomUser,CASCADE)
     quantity=models.IntegerField()
+
+class selectedProduct (models.Model):
+    Id=models.AutoField(primary_key=True)
+    picture=models.URLField()
+    productName=models.CharField(max_length=200)
+    availableQuantity=models.IntegerField()
+    pricePerUnit=models.FloatField()
+    description=models.TextField()

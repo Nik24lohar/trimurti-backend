@@ -56,7 +56,7 @@ class UserList(generics.ListCreateAPIView):
             user_data =userSerializer(data=user,many=True)
             user_data.is_valid()
             print("User Data:",user_data.data)
-            return Response({"message":"login sccessfully",'userData':user.data,"status ": status.HTTP_201_CREATED})
+            return Response({"message":"login sccessfully",'userData':user_data.data,"status ": status.HTTP_201_CREATED})
         return Response({"message":"fail to login",'userData':user.data,"status ": status.HTTP_400_BAD_REQUEST})
     
     def post(self, request,format = None):

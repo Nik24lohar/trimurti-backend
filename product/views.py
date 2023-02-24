@@ -1,5 +1,5 @@
-from .models import Product , Card
-from .serializers import ProductSerializer , CardSerializer
+from product.models import Product , Card , selectedProduct
+from product.serializers import ProductSerializer , CardSerializer , selectProductSerializer
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import filters
@@ -74,22 +74,19 @@ class CardListCreate(generics.ListCreateAPIView):
             card_data.is_valid()
             print("User Data:",card_data.data)
             return Response({"message":"product listed",'productData':card_data.data,"status ": status.HTTP_201_CREATED})
-        return Response({"message":"products not found",'productData':card_data.data,"status ": status.HTTP_400_BAD_REQUEST})
+        return Response({"message":"products not found",'productData':[],"status ": status.HTTP_400_BAD_REQUEST})
     
     def post(self, request,format = None):
-        print(request.data)
-        card = CardSerializer(data = request.data)
-        if card.is_valid():
-            card.save()
-            product=Product.objects.filter(filter=request.data['productId'])
-            avaliable=product.availableQuantity-card.quantity
-            if avaliable<0:
-                return Response({"message":f'only f{Product.availableQuantity} available'})
-            else:
-                Product.availableQuantity=avaliable
-                product.save()
-            return Response({"message":"Card created",'cardData':card.data,"status":status.HTTP_200_OK})
-        return Response({"message":"Card fail to create",'cardData':card.errors,"status":status.HTTP_400_BAD_REQUEST})
+        print(request.data['Id'])
+        
+        product=Product.objects.get(Id=request.data['Id'])
+        product_data=ProductSerializer(product)
+        if product_data.data:
+            selectproduct = selectProductSerializer(data=product_data.data)
+            if selectproduct.is_valid():
+                selectproduct.save()
+                return Response({"message":"Card created",'cardData':selectedProduct.data,"status":status.HTTP_200_OK})
+        return Response({"message":"Card fail to create",'cardData':selectedProduct.errors,"status":status.HTTP_400_BAD_REQUEST})
 
 
 class CardUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
