@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import filters
 from rest_framework import status
-
+import json
 class ProductListCreate(generics.ListCreateAPIView):
     queryset=Product.objects.all()
     serializer_class=ProductSerializer
@@ -62,31 +62,32 @@ class ProductUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
             return Response({"message":"deleted","deleted": report_data.data}, status=status.HTTP_202_ACCEPTED)
         except :
             return Response({"message":"fail to delete","deleted": report_data.data}, status=status.HTTP_400_BAD_REQUEST)
-             
 class CardListCreate(generics.ListCreateAPIView):
-    queryset=Card.objects.all()
-    serializer_class=CardSerializer
+    queryset=selectedProduct.objects.all()
+    serializer_class=selectProductSerializer
     def get(self, request,format = None): 
-        card = Card.objects.all()
-        print("card", card)
-        if card.count()>0:
-            card_data =CardSerializer(data=card,many=True)
+        selector = selectedProduct.objects.all()
+        if selector.count()>0:
+            card_data =selectProductSerializer(data=selector,many=True)
             card_data.is_valid()
             print("User Data:",card_data.data)
             return Response({"message":"product listed",'productData':card_data.data,"status ": status.HTTP_201_CREATED})
         return Response({"message":"products not found",'productData':[],"status ": status.HTTP_400_BAD_REQUEST})
     
     def post(self, request,format = None):
-        print(request.data['Id'])
+        print(type(request.data));
+        data=json.loads(request.data)
         
-        product=Product.objects.get(Id=request.data['Id'])
-        product_data=ProductSerializer(product)
-        if product_data.data:
-            selectproduct = selectProductSerializer(data=product_data.data)
-            if selectproduct.is_valid():
-                selectproduct.save()
-                return Response({"message":"Card created",'cardData':selectedProduct.data,"status":status.HTTP_200_OK})
-        return Response({"message":"Card fail to create",'cardData':selectedProduct.errors,"status":status.HTTP_400_BAD_REQUEST})
+        #product=ProductSerializer(request.data)
+       
+        
+        print(data)
+        product = selectProductSerializer(data = data)
+        if product.is_valid():
+            product.save()
+            return Response({"message":"product created",'data':product.data,"status":status.HTTP_200_OK})
+        return Response({"message":"product fail to create",'data':product.errors,"status":status.HTTP_400_BAD_REQUEST});
+        #return Response({"message":"Card fail to create",'cardData':selectedProduct.errors,"status":status.HTTP_400_BAD_REQUEST})
 
 
 class CardUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
